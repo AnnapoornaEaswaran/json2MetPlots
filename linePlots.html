@@ -237,7 +237,9 @@ body {
   <div id="daylist"></div>
   <div id="varhead"></div>
   <div id="legends"></div>
-  <div id="plot"></div>
+   
+  <div id="plot">
+    </div>
   <div id="legendOptions">
           <p class="formText">Legend Type:</p>
           <form class="formText">
@@ -248,11 +250,13 @@ body {
     </div>
   <div id="dataset-picker">
   </div>
-  
+  <div id="canvasdiv"> </div>
+  <div id="image"></div>
   
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="d3.slider.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
 <script>
 var index=-1;
 var margin = {top: 20, right: 80, bottom: 40, left: 50},
@@ -354,7 +358,7 @@ var curVariable;
 var vnames=[];
 
           $.ajax({
-          url: 'master.xml',
+          url: 'master1.xml',
           type: 'GET',
           dataType: 'xml',
           timeout: 1000,
@@ -637,7 +641,8 @@ var graphPlot= function(w_var,g_date,day_no){
           text2=" ";
         }
         d3.select("#varhead").append("p").text(text2+text+"           Day: "+text1).attr("class","vartitle");
-
+      /*var canvas=d3.select("#plot").append("canvas");
+            canvas.attr("id","canvas");*/
        svg = d3.select("#plot").append("svg")
                   .attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom)
@@ -852,7 +857,7 @@ var graphPlot= function(w_var,g_date,day_no){
 
           }
           
-
+            
       }
 
 
@@ -941,6 +946,7 @@ function update() {
   if(op>0.45||op<0)
   {
     alert("opacity value should be within 0 to 0.45");
+    downloadGraph();
   }
   else
   {
@@ -1025,6 +1031,39 @@ function yaxisFunction() {
        ylabel.attr("transform","translate(-150,"+document.body.scrollLeft+")");*/
        yaxispos.call(yAxis);
     }
+}
+function downloadGraph(){
+ /* var canvas = document.getElementById("canvas");
+  var img    = canvas.toDataURL("image/png");
+  var img_PNG = "<img src='"+img+"' />";
+
+  $('#image').html(img_PNG);*/
+
+var svg = document.querySelector("svg");
+var svgData = new XMLSerializer().serializeToString( svg );
+var canvas = d3.select("#canvasdiv").node();
+
+var svgSize = svg.getBoundingClientRect();
+    /*canvas.width = svgSize.width;
+    canvas.height = svgSize.height;*/
+canvas.innerHTML = '<canvas width="' + svgSize.width + '" height="' + svgSize.height + '"></canvas>';
+var can=document.querySelector("canvas");
+var ctx = can.getContext( "2d" );
+
+var img = new Image;
+//img.setAttribute( "src", "data:image/svg+xml;base64," + btoa( svgData ) );
+img.src="data:image/svg+xml;base64," + btoa(svgData);
+img.onload = function() {
+
+   ctx.drawImage( img, 0, 0 );
+   var download = document.createElement('a');
+    download.href = can.toDataURL( "image/png" );
+    download.download = 'graph.png';
+    download.click();
+    
+    // Now is done
+    console.log( can.toDataURL( "image/png" ) );
+};
 }
 
 </script>
